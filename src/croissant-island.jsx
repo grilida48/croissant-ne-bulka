@@ -5,7 +5,7 @@ import {
 } from 'three';
 import { createCroissant } from './croissant-mesh.js';
 
-const initialView = { pitch: .32, yaw: -.29, zoom: 1 };
+const initialView = { pitch: .58, yaw: -.38, zoom: 1.08 };
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 function CroissantIsland() {
@@ -29,11 +29,11 @@ function CroissantIsland() {
     const scene = new Scene();
     const camera = new PerspectiveCamera(38, 1, .1, 45);
     const model = createCroissant();
-    const key = new DirectionalLight(0xffe7cc, 2.55);
-    key.position.set(-3, 5, 4);
-    const rim = new DirectionalLight(0xffd8af, 1.45);
+    const key = new DirectionalLight(0xffebd4, 3);
+    key.position.set(-4, 5, 3);
+    const rim = new DirectionalLight(0xffd8af, 1.1);
     rim.position.set(3, 2, -5);
-    scene.add(model, key, rim, new HemisphereLight(0xfff8ec, 0xb58e73, 1.9));
+    scene.add(model, key, rim, new HemisphereLight(0xfff8ec, 0x956e50, 1.12));
     renderer.toneMapping = ACESFilmicToneMapping;
     renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 1.75));
     renderer.domElement.setAttribute('aria-hidden', 'true');
@@ -73,8 +73,11 @@ function CroissantIsland() {
       renderer.domElement.removeEventListener('webglcontextlost', lost);
       renderer.domElement.remove();
       renderer.dispose();
-      model.geometry.dispose();
-      model.material.dispose();
+      model.traverse((object) => {
+        object.geometry?.dispose();
+        object.material?.dispose();
+        if (object.isInstancedMesh) object.dispose();
+      });
     };
   }, []);
 
