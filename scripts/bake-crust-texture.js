@@ -1,5 +1,3 @@
-import { CanvasTexture, RepeatWrapping, SRGBColorSpace } from 'three';
-
 // Sample exposed pastry in the platter photo, away from the toppings and slate.
 const patches = [
   [743, 466, 60, 38],
@@ -29,14 +27,23 @@ function readPatch(photo, rect) {
   return { sharp, soft: context.getImageData(0, 0, stamp, stamp).data };
 }
 
-function makeTexture(context, anisotropy) {
-  const texture = new CanvasTexture(context.canvas);
-  texture.wrapS = texture.wrapT = RepeatWrapping;
-  texture.anisotropy = Math.min(8, anisotropy);
-  return texture;
+function grain(x, y, period) {
+  const wrap = (coordinate) => coordinate & (period - 1);
+  const hash = (i, j) => {
+    const seed = Math.imul(wrap(i), 374761393) + Math.imul(wrap(j), 668265263);
+    const mixed = Math.imul(seed ^ seed >>> 13, 1274126177);
+    return ((mixed ^ mixed >>> 16) >>> 0) / 4294967295;
+  };
+  const i = Math.floor(x), j = Math.floor(y);
+  const u = x - i, v = y - j;
+  const horizontal = u * u * (3 - 2 * u);
+  const vertical = v * v * (3 - 2 * v);
+  const top = hash(i, j) * (1 - horizontal) + hash(i + 1, j) * horizontal;
+  const bottom = hash(i, j + 1) * (1 - horizontal) + hash(i + 1, j + 1) * horizontal;
+  return top * (1 - vertical) + bottom * vertical;
 }
 
-export function createCrustMaps(photo, anisotropy) {
+export function bakeCrustTexture(photo) {
   const inputs = patches.map((rect) => readPatch(photo, rect));
   const weighted = new Float32Array(size * size);
   const detail = new Float32Array(size * size);
@@ -68,26 +75,36 @@ export function createCrustMaps(photo, anisotropy) {
     }
   }
 
-  const diffuseContext = canvas(size, size);
-  const surfaceContext = canvas(size, size);
-  const diffuse = diffuseContext.createImageData(size, size);
-  const surface = surfaceContext.createImageData(size, size);
+  const base = canvas(size, size);
+  const basePixels = base.createImageData(size, size);
   for (let i = 0; i < detail.length; i++) {
     const relief = detail[i] / weighted[i];
     const index = i * 4;
-    const tone = 227 + relief * 1.65;
-    diffuse.data[index] = tone + 5;
-    diffuse.data[index + 1] = tone;
-    diffuse.data[index + 2] = tone - 6;
-    diffuse.data[index + 3] = 255;
-    // Three reads height from red and roughness from green.
-    surface.data[index] = 128 + relief * 2.5;
-    surface.data[index + 1] = 146 + relief * 1.8;
-    surface.data[index + 3] = 255;
+    const height = 128 + relief * 2.5;
+    basePixels.data[index] = height;
+    basePixels.data[index + 1] = height;
+    basePixels.data[index + 2] = height;
+    basePixels.data[index + 3] = 255;
   }
-  diffuseContext.putImageData(diffuse, 0, 0);
-  surfaceContext.putImageData(surface, 0, 0);
-  const map = makeTexture(diffuseContext, anisotropy);
-  map.colorSpace = SRGBColorSpace;
-  return { map, surface: makeTexture(surfaceContext, anisotropy) };
+  base.putImageData(basePixels, 0, 0);
+
+  const resolution = 4096;
+  const baked = canvas(resolution, resolution);
+  baked.drawImage(base.canvas, 0, 0, resolution, resolution);
+  const pixels = baked.getImageData(0, 0, resolution, resolution);
+  // Add pores and flakes at native resolution, over the lower-frequency photo detail.
+  for (let y = 0; y < resolution; y++) {
+    for (let x = 0; x < resolution; x++) {
+      const index = (y * resolution + x) * 4;
+      const scale = .42 + .75 * grain(x / 16, y / 16, 256);
+      const flake = grain(x / 4, y / 8, 1024) - .5;
+      const pore = grain(x / 2, y / 2, 2048) - .5;
+      const relief = scale * (flake * 16 + pore * 7);
+      pixels.data[index] += relief;
+      pixels.data[index + 1] += relief;
+      pixels.data[index + 2] += relief;
+    }
+  }
+  baked.putImageData(pixels, 0, 0);
+  return baked.canvas;
 }

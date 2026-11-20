@@ -1,10 +1,10 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { createRoot } from 'react-dom/client';
 import {
-  ACESFilmicToneMapping, DirectionalLight, HemisphereLight, PerspectiveCamera, Scene, WebGLRenderer,
+  ACESFilmicToneMapping, DirectionalLight, HemisphereLight, PerspectiveCamera, RepeatWrapping,
+  Scene, TextureLoader, WebGLRenderer,
 } from 'three';
 import { createCroissant } from './croissant-mesh.js';
-import { createCrustMaps } from './crust-texture.js';
 
 const initialView = { pitch: .58, yaw: -.38, zoom: 1.08 };
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -69,29 +69,55 @@ function CroissantIsland() {
     resize();
 
     let disposed = false;
-    let crustMaps;
-    const photo = new Image();
-    photo.src = document.querySelector('.croissant-photo img').src;
-    photo.decode().then(() => {
-      if (disposed) return;
-      crustMaps = createCrustMaps(photo, renderer.capabilities.getMaxAnisotropy());
-      const material = model.children[0].material;
-      material.map = crustMaps.map;
-      material.bumpMap = crustMaps.surface;
-      material.bumpScale = .062;
-      material.roughnessMap = crustMaps.surface;
-      material.roughness = 1;
-      material.needsUpdate = true;
-      draw();
-      viewport.dataset.crustTexture = 'ready';
-    }).catch(() => {
-      // The model retains its geometry and colors if the photo fails to load.
-    });
+    let crustTexture;
+    const loader = new TextureLoader();
+    const compactDevice = matchMedia('(max-width: 48rem) and (pointer: coarse)').matches;
+    const size = renderer.capabilities.maxTextureSize >= 4096 && !compactDevice ? 4096 : 2048;
+    const textureObserver = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting) return;
+      textureObserver.disconnect();
+      loader.loadAsync(`assets/crust-${size}.webp`).then((texture) => {
+        if (disposed) {
+          texture.dispose();
+          return;
+        }
+        crustTexture = texture;
+        texture.wrapS = texture.wrapT = RepeatWrapping;
+        texture.anisotropy = Math.min(8, renderer.capabilities.getMaxAnisotropy());
+        const material = model.children[0].material;
+        material.map = texture;
+        material.bumpMap = texture;
+        material.bumpScale = .052;
+        material.roughnessMap = texture;
+        material.roughness = 1;
+        // Derive the material channels from one grayscale map to keep the 4K download small.
+        material.onBeforeCompile = (shader) => {
+          shader.fragmentShader = shader.fragmentShader.replace('#include <map_fragment>', `
+            #ifdef USE_MAP
+              float crustHeight = texture2D(map, vMapUv).r;
+              diffuseColor.rgb *= .75 + (crustHeight - .5) * 1.08;
+            #endif
+          `).replace('#include <roughnessmap_fragment>', `
+            float roughnessFactor = roughness;
+            #ifdef USE_ROUGHNESSMAP
+              float crustRoughness = texture2D(roughnessMap, vRoughnessMapUv).r;
+              roughnessFactor *= clamp(.57 + (crustRoughness - .5) * .72, .25, .95);
+            #endif
+          `);
+        };
+        material.needsUpdate = true;
+        draw();
+        viewport.dataset.crustTexture = String(texture.image.naturalWidth);
+      }).catch(() => {
+        // The mesh and baked vertex colors remain visible if the asset is unavailable.
+      });
+    }, { rootMargin: '320px' });
+    textureObserver.observe(viewport);
 
     return () => {
       disposed = true;
-      crustMaps?.map.dispose();
-      crustMaps?.surface.dispose();
+      textureObserver.disconnect();
+      crustTexture?.dispose();
       observer.disconnect();
       repaint.current = () => {};
       renderer.domElement.removeEventListener('webglcontextlost', lost);
