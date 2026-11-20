@@ -113,12 +113,12 @@ h1 > span { display: block; }
 .photo-frame {
   position: relative;
   overflow: hidden;
-  aspect-ratio: 1 / 1;
+  aspect-ratio: 4 / 5;
   border-radius: 45% 45% 1.2rem 1.2rem;
   background: #e6c1ab;
   box-shadow: 0 1.5rem 3rem #643a2230;
 }
-.photo-frame img { width: 100%; height: 100%; display: block; object-fit: cover; }
+.photo-frame img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 55%; }
 figcaption { margin-top: 1rem; text-align: center; font-weight: 700; }
 .section-inner { padding-block: clamp(3rem, 8vw, 8rem); }
 h2 { font-size: clamp(2rem, 8vw, 6rem); line-height: 1.12; letter-spacing: -.025em; overflow-wrap: anywhere; }
@@ -151,7 +151,7 @@ footer p { margin: 0; }
 @media (max-width: 48rem) {
   .hero, .visit { grid-template-columns: minmax(0, 1fr); }
   .hero-photo { width: min(100%, 34rem); justify-self: center; }
-  .photo-frame { aspect-ratio: 5 / 4; }
+  .photo-frame { aspect-ratio: 4 / 5; }
   nav { order: 1; flex-basis: 100%; }
 }
 
