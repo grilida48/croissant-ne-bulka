@@ -48,11 +48,11 @@ function sample(fraction, angle, position, color) {
   const seam = phase - Math.floor(phase);
   const lip = Math.exp(-Math.pow((seam - .88) / .10, 2));
   const groove = Math.exp(-Math.pow((Math.min(seam, 1 - seam)) / .047, 2));
-  const layers = Math.sin(turn * (seam * 4.7 + waves * .19));
+  const layers = Math.sin(turn * (seam * (4.4 + waves) + waves * .28));
   const ridge = Math.pow(seam, 1.7) * smooth(Math.min(1, (1 - seam) / .09));
-  const radius = 1.06 * taper * (1 + .09 * ridge + .063 * lip - .027 * groove
-    + .012 * layers + .068 * (waves - .5) + .042 * (bubbles - .5)
-    + .025 * (crumbs - .5));
+  const radius = 1.06 * taper * (1 + .074 * ridge + .044 * lip - .021 * groove
+    + .006 * layers + .088 * (waves - .5) + .032 * (bubbles - .5)
+    + .012 * (crumbs - .5));
   const underside = vertical < 0 ? .66 : .86;
   position.set(x - dz / length * horizontal * radius,
     vertical * radius * underside + .025 * Math.sin(t * 8),
@@ -60,36 +60,52 @@ function sample(fraction, angle, position, color) {
 
   if (color) {
     color.copy(crust);
-    color.lerp(pale, Math.max(0, .38 * lip + .23 * layers * lip + .49 * bubbles + .2 * waves - .34));
-    color.lerp(toasted, Math.max(0, .49 * groove + .22 * vertical + .37 * waves + .15 * crumbs - .28));
+    color.lerp(pale, Math.max(0, .28 * lip + .12 * layers * lip + .60 * bubbles + .23 * waves - .31));
+    color.lerp(toasted, Math.max(0, .40 * groove + .17 * vertical + .53 * waves + .10 * crumbs - .29));
   }
 }
 
 export function createCroissant() {
-  const positions = new Float32Array((along + 1) * around * 3);
+  const columns = around + 1;
+  const positions = new Float32Array((along + 1) * columns * 3);
   const colors = new Float32Array(positions.length);
+  const uv = new Float32Array((along + 1) * columns * 2);
   const indices = [];
   const position = new Vector3();
   const color = new Color();
   for (let row = 0; row <= along; row++) {
-    for (let col = 0; col < around; col++) {
-      const current = row * around + col;
-      sample(row / along, col / around * turn, position, color);
+    for (let col = 0; col < columns; col++) {
+      const current = row * columns + col;
+      const u = row / along;
+      const v = col / around;
+      sample(u, (col % around) / around * turn - Math.PI / 2, position, color);
       position.toArray(positions, current * 3);
       color.toArray(colors, current * 3);
-      if (row === along) continue;
-      const next = row * around + (col + 1) % around;
-      indices.push(current, current + around, next, next, current + around, next + around);
+      uv.set([u * 1.45 + .12 * Math.sin(v * turn), v * 2], current * 2);
+      if (row === along || col === around) continue;
+      const next = current + 1;
+      indices.push(current, current + columns, next, next, current + columns, next + columns);
     }
   }
   const geometry = new BufferGeometry();
   geometry.setAttribute('position', new BufferAttribute(positions, 3));
   geometry.setAttribute('color', new BufferAttribute(colors, 3));
+  geometry.setAttribute('uv', new BufferAttribute(uv, 2));
   geometry.setIndex(indices);
   geometry.computeVertexNormals();
+  const normals = geometry.getAttribute('normal');
+  const seamNormal = new Vector3();
+  for (let row = 0; row <= along; row++) {
+    const first = row * columns;
+    const last = first + around;
+    position.fromBufferAttribute(normals, first);
+    seamNormal.fromBufferAttribute(normals, last).add(position).normalize();
+    normals.setXYZ(first, seamNormal.x, seamNormal.y, seamNormal.z);
+    normals.setXYZ(last, seamNormal.x, seamNormal.y, seamNormal.z);
+  }
   const pastry = new Group();
   pastry.add(new Mesh(geometry, new MeshPhysicalMaterial({
-    vertexColors: true, roughness: .49, clearcoat: .32, clearcoatRoughness: .36,
+    vertexColors: true, roughness: .57, clearcoat: .42, clearcoatRoughness: .29,
   })));
   pastry.add(scatterTopping(18, true), scatterTopping(25, false));
   return pastry;

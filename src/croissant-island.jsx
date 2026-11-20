@@ -4,6 +4,7 @@ import {
   ACESFilmicToneMapping, DirectionalLight, HemisphereLight, PerspectiveCamera, Scene, WebGLRenderer,
 } from 'three';
 import { createCroissant } from './croissant-mesh.js';
+import { createCrustMaps } from './crust-texture.js';
 
 const initialView = { pitch: .58, yaw: -.38, zoom: 1.08 };
 const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
@@ -29,7 +30,7 @@ function CroissantIsland() {
     const scene = new Scene();
     const camera = new PerspectiveCamera(38, 1, .1, 45);
     const model = createCroissant();
-    const key = new DirectionalLight(0xffebd4, 3);
+    const key = new DirectionalLight(0xffebd4, 3.35);
     key.position.set(-4, 5, 3);
     const rim = new DirectionalLight(0xffd8af, 1.1);
     rim.position.set(3, 2, -5);
@@ -67,7 +68,30 @@ function CroissantIsland() {
     repaint.current = draw;
     resize();
 
+    let disposed = false;
+    let crustMaps;
+    const photo = new Image();
+    photo.src = document.querySelector('.croissant-photo img').src;
+    photo.decode().then(() => {
+      if (disposed) return;
+      crustMaps = createCrustMaps(photo, renderer.capabilities.getMaxAnisotropy());
+      const material = model.children[0].material;
+      material.map = crustMaps.map;
+      material.bumpMap = crustMaps.surface;
+      material.bumpScale = .062;
+      material.roughnessMap = crustMaps.surface;
+      material.roughness = 1;
+      material.needsUpdate = true;
+      draw();
+      viewport.dataset.crustTexture = 'ready';
+    }).catch(() => {
+      // The model retains its geometry and colors if the photo fails to load.
+    });
+
     return () => {
+      disposed = true;
+      crustMaps?.map.dispose();
+      crustMaps?.surface.dispose();
       observer.disconnect();
       repaint.current = () => {};
       renderer.domElement.removeEventListener('webglcontextlost', lost);
