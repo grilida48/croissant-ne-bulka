@@ -4,6 +4,15 @@ const addressStatus = document.querySelector('#address-status');
 const shareButton = document.querySelector('#share');
 const shareUrl = document.querySelector('#share-url');
 const shareStatus = document.querySelector('#share-status');
+const motionToggle = document.querySelector('#motion-toggle');
+
+motionToggle.hidden = false;
+document.body.dataset.motion = 'running';
+motionToggle.addEventListener('click', () => {
+  const paused = document.body.dataset.motion !== 'paused';
+  document.body.dataset.motion = paused ? 'paused' : 'running';
+  motionToggle.setAttribute('aria-pressed', String(paused));
+});
 
 if (navigator.clipboard?.writeText) {
   copyAddress.hidden = false;

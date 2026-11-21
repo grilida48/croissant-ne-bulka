@@ -120,80 +120,51 @@ h1 > span { display: block; }
 }
 .photo-frame img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: center 55%; }
 figcaption { margin-top: 1rem; text-align: center; font-weight: 700; }
-.sr-only {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-.croissant-lab {
+.about-layout, .visit {
   display: grid;
-  grid-template-columns: minmax(16rem, .78fr) minmax(0, 1.22fr);
+  grid-template-columns: minmax(0, 1.18fr) minmax(0, .82fr);
   align-items: center;
   gap: clamp(2rem, 7vw, 7rem);
-  background: var(--cream);
 }
-.croissant-photo { margin: 0; }
-.croissant-photo img {
+.about-layout > div > p { max-width: 42ch; font-size: clamp(1rem, 2.4vw, 1.4rem); }
+.about-facts > div { border-bottom-color: #fff4e944; }
+.food-photo, .storefront-photo { margin: 0; min-width: 0; }
+.food-photo img, .storefront-photo img {
   display: block;
   width: 100%;
-  aspect-ratio: 3 / 4;
+  height: auto;
   object-fit: cover;
   border: 1px solid var(--line);
-  border-radius: 45% 45% 1.2rem 1.2rem;
   box-shadow: 0 1.25rem 2.6rem #6b381b24;
 }
-.croissant-lab-copy { min-width: 0; }
-.croissant-lab-copy > p:not(.eyebrow) { max-width: 46ch; }
-.croissant-lab-copy h2 { font-size: clamp(2.5rem, 6.5vw, 6.7rem); }
-#croissant-3d-root { min-height: 28rem; margin-top: 1.5rem; }
-.croissant-loading { padding-block: 10rem; text-align: center; }
-.croissant-viewer { width: 100%; }
-.croissant-stage {
+.food-photo img { aspect-ratio: 4 / 5; border-radius: 45% 45% 1.2rem 1.2rem; }
+.storefront-photo img { aspect-ratio: 4 / 5; border-radius: 1.25rem; }
+.menu {
   position: relative;
-  isolation: isolate;
-  min-height: clamp(17rem, 33vw, 27rem);
-  overflow: hidden;
+  background: var(--cream);
+  overflow: clip;
+}
+.menu-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-block: clamp(1.5rem, 4vw, 3rem);
+}
+.menu-card {
   border: 1px solid var(--line);
-  border-radius: 2rem;
-  background: radial-gradient(ellipse at 45% 32%, #fff9ed, #eee0c9 83%);
-  touch-action: none;
-  cursor: grab;
-  user-select: none;
+  border-radius: 1.25rem;
+  background: #fffaf4;
+  padding: clamp(1.2rem, 3vw, 2.25rem);
 }
-.croissant-stage::before {
-  content: '';
-  position: absolute;
-  z-index: -1;
-  inset: 71% 22% 18%;
-  border-radius: 50%;
-  background: #76442039;
-  filter: blur(.95rem);
-}
-.croissant-stage[data-dragging] { cursor: grabbing; }
-.croissant-stage canvas, .croissant-stage img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-}
-.croissant-stage img { object-fit: cover; }
-.croissant-stage[data-unavailable] { touch-action: auto; cursor: auto; }
-.croissant-stage[data-unavailable] canvas { display: none; }
-.croissant-help { margin: .65rem 0 .85rem; text-align: center; font-size: .9rem; font-weight: 750; }
-.croissant-controls { display: flex; justify-content: center; flex-wrap: wrap; gap: .6rem; }
-.croissant-controls .button { min-width: 2.8rem; }
+.menu-card h3 { margin: 0 0 1rem; font-size: clamp(1.2rem, 2.2vw, 1.7rem); line-height: 1.25; }
+.menu-card ul { padding: 0; list-style: none; margin: 0; }
+.menu-card li { padding: .55rem 0; border-bottom: 1px solid var(--line); }
+.menu-card p { margin: .85rem 0 0; font-size: .875rem; }
 .section-inner { padding-block: clamp(3rem, 8vw, 8rem); }
 h2 { font-size: clamp(2rem, 8vw, 6rem); line-height: 1.12; letter-spacing: -.025em; overflow-wrap: anywhere; }
 .statement { background: radial-gradient(ellipse at top right, #694138, var(--ink) 70%); color: var(--cream); }
 .section-inner > p:not(.feedback) { max-width: 42ch; font-size: clamp(1rem, 2.4vw, 1.4rem); }
-.visit { display: grid; grid-template-columns: .85fr 1fr; gap: 2rem; }
+.visit h2 { margin-bottom: 1.2rem; }
 dl { margin: 0 0 1.25rem; }
 dl > div { padding: .8rem 0; border-bottom: 1px solid var(--line); }
 dt { font-weight: 800; }
@@ -215,15 +186,15 @@ dd { margin: .25rem 0 0; }
 .feedback:empty { margin: 0; min-height: 0; }
 footer { display: flex; align-items: center; flex-wrap: wrap; gap: .75rem 2rem; padding-block: 1.5rem; }
 footer p { margin: 0; }
-.credit { font-size: .875rem; }
+.motion-toggle { font-size: .875rem; margin-inline-start: auto; }
+.motion-toggle[aria-pressed="true"] { background: var(--cream); }
 
 @media (max-width: 48rem) {
-  .hero, .visit, .croissant-lab { grid-template-columns: minmax(0, 1fr); }
+  .hero, .visit, .about-layout, .menu-grid { grid-template-columns: minmax(0, 1fr); }
   .hero-photo { width: min(100%, 34rem); justify-self: center; }
   .photo-frame { aspect-ratio: 4 / 5; }
-  .croissant-photo { width: min(100%, 31rem); justify-self: center; }
-  #croissant-3d-root { min-height: 24rem; }
-  .croissant-stage { min-height: 18rem; }
+  .food-photo, .storefront-photo { width: min(100%, 28rem); justify-self: center; }
+  .motion-toggle { margin-inline-start: 0; }
   nav { order: 1; flex-basis: 100%; }
 }
 
@@ -238,6 +209,41 @@ footer p { margin: 0; }
   .button:active { transform: scale(.96); }
   .photo-frame img { transition: scale 850ms var(--ease); }
   [data-visible] { animation: rise 750ms var(--ease); }
+
+  body[data-motion] .hero, body[data-motion] .menu { position: relative; isolation: isolate; overflow: clip; }
+  body[data-motion] .hero::before, body[data-motion] .menu::before {
+    content: '';
+    position: absolute;
+    z-index: -1;
+    pointer-events: none;
+    width: min(58rem, 100%);
+    height: 100%;
+    inset: 0 0 auto auto;
+    background: radial-gradient(ellipse closest-side, #e49bb180, transparent);
+    animation: light-drift 17s ease-in-out infinite alternate;
+  }
+  body[data-motion] .menu::before {
+    background: radial-gradient(ellipse closest-side, #f7bc9766, transparent);
+    animation-duration: 21s;
+    animation-delay: -9s;
+  }
+  body[data-motion] .photo-frame img { animation: photo-breathe 13s ease-in-out infinite alternate; }
+  body[data-motion="paused"] .hero::before,
+  body[data-motion="paused"] .menu::before,
+  body[data-motion="paused"] .photo-frame img { animation-play-state: paused; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-toggle { display: none; }
+}
+
+@keyframes light-drift {
+  from { transform: translate3d(12%, -13%, 0); opacity: .55; }
+  to { transform: translate3d(-38%, 13%, 0); opacity: 1; }
+}
+@keyframes photo-breathe {
+  from { transform: scale(1); }
+  to { transform: scale(1.045); }
 }
 
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
