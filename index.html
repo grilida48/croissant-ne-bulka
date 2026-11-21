@@ -7,7 +7,7 @@
   <meta name="description" content="Круассан не булка — кофейня с завтраками и кофе навынос в Сириусе, Голубая улица, 1Б. Ежедневно 08:00–21:00.">
   <title>Круассан не булка — кофейня на Голубой улице</title>
   <link rel="preload" href="assets/fonts/manrope-cyrillic.woff2" as="font" type="font/woff2" crossorigin>
-  <link rel="stylesheet" href="refinements.css?v=6">
+  <link rel="stylesheet" href="refinements.css?v=7">
   <script src="refinements.js?v=3" defer></script>
 </head>
 <body>
@@ -57,22 +57,41 @@
     </section>
     <section class="menu section-inner" id="menu" aria-labelledby="menu-title">
       <h2 id="menu-title" data-reveal>Что в меню</h2>
-      <div class="menu-grid">
-        <article class="menu-card" data-reveal>
-          <h3>Кофейная классика</h3>
-          <ul><li>Эспрессо</li><li>Американо</li><li>Капучино</li><li>Флэт уайт</li></ul>
-        </article>
-        <article class="menu-card" data-reveal>
-          <h3>Завтраки и боулы</h3>
-          <ul><li>Омлет с авокадо</li><li>Омлет с беконом</li><li>Боул с креветкой</li><li>Боул с курицей</li></ul>
-        </article>
-        <article class="menu-card" data-reveal>
-          <h3>Летнее меню</h3>
-          <ul><li>Безалкогольный мохито</li><li>Ягодный смузи</li></ul>
-          <p>Наличие сезонных напитков можно уточнить в кофейне.</p>
-        </article>
+      <nav class="menu-nav" aria-label="Разделы меню">
+        <a class="button" href="#menu-coffee">Кофе</a>
+        <a class="button" href="#menu-food">Завтраки и боулы</a>
+        <a class="button" href="#menu-seasonal">Сезонные напитки</a>
+      </nav>
+      <section class="menu-group menu-coffee" id="menu-coffee" aria-labelledby="menu-coffee-title">
+        <h3 id="menu-coffee-title">Кофейная классика</h3>
+        <ul class="product-grid" role="list">
+          <li class="product-card" data-reveal><h4>Эспрессо</h4><div class="product-details"><span>40 мл</span><data value="200">200 ₽</data></div></li>
+          <li class="product-card" data-reveal><h4>Американо</h4><div class="product-details"><span>200 мл</span><data value="190">190 ₽</data></div></li>
+          <li class="product-card" data-reveal><h4>Капучино</h4><div class="product-details"><span>200 мл</span><data value="200">200 ₽</data></div></li>
+          <li class="product-card" data-reveal><h4>Флэт уайт</h4><div class="product-details"><span>200 мл</span><data value="250">250 ₽</data></div></li>
+        </ul>
+      </section>
+      <section class="menu-group menu-food" id="menu-food" aria-labelledby="menu-food-title">
+        <h3 id="menu-food-title">Завтраки и боулы</h3>
+        <ul class="product-grid" role="list">
+          <li class="product-card" data-reveal><h4>Омлет с авокадо</h4><div class="product-details"><span>150 г</span><data value="280">280 ₽</data></div></li>
+          <li class="product-card" data-reveal><h4>Омлет с беконом</h4><div class="product-details"><span>150 г</span><data value="250">250 ₽</data></div></li>
+          <li class="product-card" data-reveal><h4>Боул с креветкой</h4><div class="product-details"><span>300 г</span><data value="550">550 ₽</data></div></li>
+          <li class="product-card" data-reveal><h4>Боул с курицей</h4><div class="product-details"><span>300 г</span><data value="470">470 ₽</data></div></li>
+        </ul>
+      </section>
+      <section class="menu-group menu-seasonal" id="menu-seasonal" aria-labelledby="menu-seasonal-title">
+        <h3 id="menu-seasonal-title">Сезонные напитки</h3>
+        <p class="menu-note">Наличие сезонных напитков уточняйте в кофейне.</p>
+        <ul class="product-grid" role="list">
+          <li class="product-card" data-reveal><h4>Мохито без алкоголя</h4><div class="product-details"><span>300 мл</span><data value="350">350 ₽</data></div></li>
+          <li class="product-card" data-reveal><h4>Ягодный смузи</h4><div class="product-details"><span>300 мл</span><data value="300">300 ₽</data></div></li>
+        </ul>
+      </section>
+      <div class="menu-source">
+        <a class="button primary" href="https://yandex.ru/maps/org/kruassan_ne_bulka/102419023875/menu/" target="_blank" rel="noopener noreferrer">Меню и фото в Яндекс Картах</a>
+        <p class="menu-note">Цены сверены с карточкой кофейни в Яндекс Картах.</p>
       </div>
-      <a class="button primary menu-link" href="https://yandex.ru/maps/org/kruassan_ne_bulka/102419023875/menu/" target="_blank" rel="noopener noreferrer">Полное меню и цены в Яндекс Картах</a>
     </section>
     <section class="visit section-inner" id="visit">
       <div class="visit-details">
