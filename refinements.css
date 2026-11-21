@@ -167,13 +167,20 @@ figcaption { margin-top: 1rem; text-align: center; font-weight: 700; }
 .product-card {
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  min-height: 8.5rem;
-  padding: clamp(.8rem, 2vw, 1.35rem);
   border: 1px solid var(--line);
   border-top: 3px solid var(--card-rule);
   border-radius: .9rem;
+  overflow: hidden;
   background: var(--card-color);
+}
+.product-media { overflow: hidden; background: #e8d5c7; }
+.product-media img { display: block; width: 100%; height: auto; aspect-ratio: 17 / 14; object-fit: cover; }
+.product-copy {
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: clamp(.8rem, 2vw, 1.35rem);
 }
 .product-card h4 { margin: 0 0 .9rem; font-size: clamp(1rem, 1.6vw, 1.22rem); line-height: 1.3; overflow-wrap: anywhere; }
 .product-details {
@@ -277,6 +284,8 @@ footer p { margin: 0; }
 }
 
 @media (prefers-reduced-motion: no-preference) and (hover: hover) {
+  .product-media img { transition: transform 600ms var(--ease); }
+  .product-card:hover img { transform: scale(1.05); }
   .photo-frame:hover img { scale: 1.055; }
   .button:hover { transform: translateY(-3px); }
   .phone-list a:hover { transform: translateX(.35rem); }
